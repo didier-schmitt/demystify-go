@@ -1,0 +1,26 @@
+---
+- name: Vagrant provision
+  hosts: all
+  become: true
+  gather_facts: no
+
+  tasks:
+  - name: Download Go archive
+    get_url:
+      url: "https://storage.googleapis.com/golang/go1.8.1.linux-amd64.tar.gz"
+      checksum: "sha256:a579ab19d5237e263254f1eac5352efcf1d70b9dacadb6d6bb12b0911ede8994"
+      dest: /tmp/go.tar.gz
+
+  - name: Extract Go archive
+    unarchive:
+      src: /tmp/go.tar.gz
+      remote_src: yes
+      dest: /usr/local
+      creates: /usr/local/go
+
+  - name: Add Go to the PATH
+    blockinfile:
+      path: /etc/profile
+      block: |
+        export PATH=$PATH:/usr/local/go/bin
+        export GOPATH=/usr/src/go
